@@ -30,8 +30,11 @@ module DocusignRest
           }.to_json
         }
       else
+        access_token_value = access_token
+        access_token_value = access_token_value.call if access_token_value.is_a?(Proc)
+
         @docusign_authentication_headers = {
-          'Authorization' => "Bearer #{access_token}"
+          'Authorization' => "Bearer #{access_token_value}"
         }
       end
 
@@ -66,6 +69,10 @@ module DocusignRest
       default = {
         'Accept' => 'json' #this seems to get added automatically, so I can probably remove this
       }
+
+      if access_token.is_a?(Proc)
+        default['Authorization'] = "Bearer #{access_token.call}"
+      end
 
       default.merge!(user_defined_headers) if user_defined_headers
 
